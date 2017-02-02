@@ -1,5 +1,6 @@
 import sys
 import time
+from resource import getrusage, RUSAGE_SELF
 from utils import *
 
 class State:
@@ -7,10 +8,12 @@ class State:
     Should be an abstract class valid for a given problem. For simplicity, now 
     only works with the 8-puzzle problem
     """
-    def __init__(self, board, zero, cost):
+    def __init__(self, board, zero, cost, prev = None, action = None):
         self.board = [list(b) for b in board]
         self.cost = cost
         self.zero = zero
+        self.prev = prev
+        self.action = action
     def isGoal(self):
         for i in range(3):
             for j in range(3):
@@ -47,19 +50,19 @@ class State:
             if action == 'Up':
                 board[i][j] = self.board[i-1][j]
                 board[i-1][j] = 0
-                successors.append((State(board, (i-1, j), self.cost + 1), action))
+                successors.append(State(board, (i-1, j), self.cost + 1, self, action))
             elif action == 'Down':
                 board[i][j] = self.board[i+1][j]
                 board[i+1][j] = 0
-                successors.append((State(board, (i+1, j), self.cost + 1), action))
+                successors.append(State(board, (i+1, j), self.cost + 1, self, action))
             elif action == 'Left':
                 board[i][j] = self.board[i][j - 1]
                 board[i][j - 1] = 0
-                successors.append((State(board, (i, j-1), self.cost + 1), action))
+                successors.append(State(board, (i, j-1), self.cost + 1, self, action))
             elif action == 'Right':
                 board[i][j] = self.board[i][j + 1]
                 board[i][j+1] = 0
-                successors.append((State(board, (i, j+1), self.cost + 1), action))
+                successors.append(State(board, (i, j+1), self.cost + 1, self, action))
         return successors
 
 
@@ -83,10 +86,10 @@ class State:
 
 class Solver:
     def __init__(self, start_state):
-        self.path = 0
+        self.path = []
         self.cost_of_path = 0
         self.nodes_expanded = 0
-        self.fringe_size = 0
+        self.fringe_size = 1
         self.max_fringe_size = 1
         self.search_depth = 0
         self.max_search_depth = 0
@@ -99,41 +102,40 @@ class Solver:
         Implements Breadth First Search Strategy
         """
         start_time = time.time()
-        closed = set()
-        fringe = Queue()
-        paths = Queue()
-        
-        initial = self.start_state
-        fringe.enqueue(initial)
-        paths.enqueue([])
-        while True:
-            if fringe.isEmpty():
-                self.path = []
-                return
-           
-            # We add every node we want to expand, to the closed list 
-            node = fringe.dequeue()
-            closed.add(node)
-            path = paths.dequeue()
-            if node.isGoal():
-                self.cost_of_path = len(path)
-                self.fringe_size = len(fringe)
+        frontier = Queue()
+        frontier.enqueue(self.start_state)
+        explored = set()
+        while not frontier.isEmpty():
+            state = frontier.dequeue()
+            self.fringe_size -= 1
+            explored.add(state)
+            if state.isGoal():
+                curr = state
+                path = []
+                while curr.prev != None:
+                    path.insert(0, curr.action)
+                    curr = curr.prev
+                self.cost_of_path = state.cost
                 self.path = path
                 self.search_depth = self.cost_of_path
                 self.running_time = time.time() - start_time
-                return
+                return True
             
+            neighbors = state.expand()
             self.nodes_expanded += 1
-            for child_node in node.expand():
-                if child_node[0] not in closed:
-                    tmp = list(path)
-                    fringe.enqueue(child_node[0])
-                    tmp.append(child_node[1])
-                    paths.enqueue(tmp)
-                    if len(fringe) > self.max_fringe_size:
-                        self.max_fringe_size = len(fringe)
-                    if child_node[0].cost > self.max_search_depth:
-                        self.max_search_depth = child_node[0].cost
+            for neighbor in neighbors:
+                if neighbor not in explored:
+                    frontier.enqueue(neighbor)
+                    explored.add(neighbor)
+                    self.fringe_size += 1
+                    if self.fringe_size > self.max_fringe_size:
+                        self.max_fringe_size = self.fringe_size
+                    if neighbor.cost > self.max_search_depth:
+                        self.max_search_depth = neighbor.cost
+            ram = getrusage(RUSAGE_SELF).ru_maxrss / 1e6
+            if ram > self.max_ram_usage:
+                self.max_ram_usage = ram
+        return False
 
              
     def depthFirstSearch(self):
@@ -141,44 +143,41 @@ class Solver:
         Implements Depth First Search Strategy
         """
         start_time = time.time()
-        closed = set()
-        fringe = Stack()
-        paths = Stack()
-
-        initial = self.start_state
-        fringe.push(initial)
-        paths.push([])
-       
-        while True:
-            if fringe.isEmpty():
-                self.path = []
-                return
-
-            # We add every node we want to expand, to the closed list 
-            node = fringe.pop()
-            closed.add(node)
-            path = paths.pop()
-            if node.isGoal():
-                self.cost_of_path = len(path)
-                self.fringe_size = len(fringe)
+        frontier = Stack()
+        frontier.push(self.start_state)
+        explored = set()
+        while not frontier.isEmpty():
+            state = frontier.pop()
+            self.fringe_size -= 1
+            explored.add(state)
+            if state.isGoal():
+                curr = state
+                path = []
+                while curr.prev != None:
+                    path.insert(0, curr.action)
+                    curr = curr.prev
+                self.cost_of_path = state.cost
                 self.path = path
                 self.search_depth = self.cost_of_path
                 self.running_time = time.time() - start_time
-                return
-
+                return True
+            
+            neighbors = state.expand()
             self.nodes_expanded += 1
-            successors = node.expand()
-            successors.reverse()
-            for child_node in successors:
-                if child_node[0] not in closed and child_node[0] not in fringe.stack:
-                    tmp = list(path)
-                    fringe.push(child_node[0])
-                    tmp.append(child_node[1])
-                    paths.push(tmp)
-                    if len(fringe) > self.max_fringe_size:
-                        self.max_fringe_size = len(fringe)
-                    if child_node[0].cost > self.max_search_depth:
-                        self.max_search_depth = child_node[0].cost
+            neighbors.reverse()
+            for neighbor in neighbors:
+                if neighbor not in explored:
+                    frontier.push(neighbor)
+                    explored.add(neighbor)
+                    self.fringe_size += 1
+                    if self.fringe_size > self.max_fringe_size:
+                        self.max_fringe_size = self.fringe_size
+                    if neighbor.cost > self.max_search_depth:
+                        self.max_search_depth = neighbor.cost
+            ram = getrusage(RUSAGE_SELF).ru_maxrss / 1e6
+            if ram > self.max_ram_usage:
+                self.max_ram_usage = ram
+        return False
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
@@ -201,19 +200,23 @@ if __name__ == '__main__':
         solver.breadthFirstSearch()
     else:
         solver.depthFirstSearch()
-    print "path_to_goal:", 
-    print solver.path
-    print "cost_of_path:", 
-    print solver.cost_of_path
-    print "nodes_expanded:",
-    print solver.nodes_expanded
-    print "fringe_size:",
-    print solver.fringe_size
-    print "max_fringe_size:",
-    print solver.max_fringe_size
-    print "search_depth:",
-    print solver.search_depth
-    print "max_search_depth:",
-    print solver.max_search_depth
-    print "running_time:",
-    print ("%.8f") % solver.running_time
+
+    with open("output.txt", "w") as text_file:
+        text_file.write("path_to_goal: ") 
+        text_file.write(str(solver.path) + "\n")
+        text_file.write("cost_of_path: ") 
+        text_file.write(str(solver.cost_of_path) + "\n")
+        text_file.write("nodes_expanded: ")
+        text_file.write(str(solver.nodes_expanded) + "\n")
+        text_file.write("fringe_size: ")
+        text_file.write(str(solver.fringe_size) + "\n")
+        text_file.write("max_fringe_size: ")
+        text_file.write(str(solver.max_fringe_size) + "\n")
+        text_file.write("search_depth: ")
+        text_file.write(str(solver.search_depth) + "\n")
+        text_file.write("max_search_depth: ")
+        text_file.write(str(solver.max_search_depth) + "\n")
+        text_file.write("running_time: ")
+        text_file.write(("%.8f") % solver.running_time + "\n")
+        text_file.write("max_ram_usage: ")
+        text_file.write(("%.8f") % solver.max_ram_usage + "\n")
