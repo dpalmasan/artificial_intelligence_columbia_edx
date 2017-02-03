@@ -7,11 +7,12 @@ class State:
     only works with the 8-puzzle problem. This class defines a State for the N
     puzzle problem.
     """
-    def __init__(self, board, zero, cost, prev = None, action = None):
+    def __init__(self, board, zero, cost, prev = None, action = None, depth = 0):
         self.board = [list(b) for b in board]
         self.cost = cost
         self.zero = zero
         self.prev = prev
+        self.depth = depth
         self.action = action
 
     def isGoal(self):
