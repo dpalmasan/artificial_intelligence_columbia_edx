@@ -242,6 +242,7 @@ class Solver:
         frontier = PriorityQueue()
         frontier.insert(problem.getStartState(), 0)
         explored = set()
+        idx = 0
         while not frontier.isEmpty():
             state = frontier.deleteMin()
             self.fringe_size -= 1
@@ -263,7 +264,8 @@ class Solver:
             for neighbor in neighbors:
                 neighbor.depth = state.depth + 1
                 if neighbor not in explored:
-                    frontier.insert(neighbor, problem.getCostOfAction(neighbor) + h(neighbor))
+                    idx += 1
+                    frontier.insert(neighbor, problem.f(neighbor, h, idx))
                     explored.add(neighbor)
                     self.fringe_size += 1
                     if self.fringe_size > self.max_fringe_size:

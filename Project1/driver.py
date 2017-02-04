@@ -119,9 +119,11 @@ class Npuzzle(Problem):
         return state.expand()
 
     def getCostOfAction(self, state):
-        value = {"Up": 0, "Down": 1, "Left": 2, "Right": 3}
-        #return 10*state.cost + value[state.action]
         return state.cost
+
+    def f(self, state, h, idx):
+        value = {"Up": 0, "Down": 1, "Left": 2, "Right": 3}
+        return (self.getCostOfAction(state) + h(state), value[state.action], idx)
     
 
 if __name__ == '__main__':
