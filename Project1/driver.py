@@ -85,6 +85,22 @@ class State:
         s += '\n'.join([' '.join(str(y) for y in w) for w in self.board ])
         return s
 
+def manhattanDistance(state):
+    """
+    Implements Manhattan distance heuristic for the N-Puzzle.
+    """
+
+    # TODO: This should work for a board of arbitrary dimensions
+    manDist = 0
+    for i in range(3):
+        for j in range(3):
+            if state.board[i][j] != 0:
+                ii = state.board[i][j] / 3
+                jj = state.board[i][j] % 3
+                manDist += abs(ii - i) + abs(jj - j)
+    return manDist
+    
+
 class Npuzzle(Problem):
     """
     This class is an implementation of the Npuzzle as a search problem. It contains
@@ -101,6 +117,11 @@ class Npuzzle(Problem):
 
     def getSuccessors(self, state):
         return state.expand()
+
+    def getCostOfAction(self, state):
+        value = {"Up": 0, "Down": 1, "Left": 2, "Right": 3}
+        #return 10*state.cost + value[state.action]
+        return state.cost
     
 
 if __name__ == '__main__':
@@ -124,8 +145,14 @@ if __name__ == '__main__':
     # TODO: Add cases that uses A-start and the rest of algorithms that are going to be implemented
     if method == 'bfs':
         solver.breadthFirstSearch(problem)
-    else:
+    elif method == 'dfs':
         solver.depthFirstSearch(problem)
+    elif method == 'ucs':
+        solver.uniformCostSearch(problem)
+    elif method == 'ast':
+        solver.aStarSearch(problem, manhattanDistance)
+    else:
+        solver.iterativeDeepening(problem)
 
     # Writing to output file
     with open("output.txt", "w") as text_file:
