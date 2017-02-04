@@ -1,5 +1,6 @@
 import sys
 from search import *
+from math import sqrt
 
 class State:
     """
@@ -14,11 +15,12 @@ class State:
         self.prev = prev
         self.depth = depth
         self.action = action
+        self.n = len(self.board)
 
     def isGoal(self):
-        for i in range(3):
-            for j in range(3):
-                if (3*i + j) != self.board[i][j]:
+        for i in range(self.n):
+            for j in range(self.n):
+                if (self.n*i + j) != self.board[i][j]:
                     return False
         return True
     def getActions(self):
@@ -30,11 +32,11 @@ class State:
         j = self.zero[1]
         if i > 0:
             actions.append('Up')
-        if i < 2:
+        if i < self.n - 1:
             actions.append('Down')
         if j > 0:
             actions.append('Left')
-        if j < 2:
+        if j < self.n - 1:
             actions.append('Right')
         return actions
 
@@ -70,7 +72,7 @@ class State:
     def __eq__(self, other):
         """
         """
-        for row in range( 3 ):
+        for row in range( self.n ):
             if self.board[row] != other.board[row]:
                 return False
         return True
@@ -81,8 +83,9 @@ class State:
     def __str__(self):
         s = "Current moves: " + str(self.cost) + "\n"
         s += "Zero Position: " + str(self.zero) + "\n"
+        s += "Dim: " + str(self.n) + "\n"
         s += "Board:\n"
-        s += '\n'.join([' '.join(str(y) for y in w) for w in self.board ])
+        s += '\n'.join([' '.join("%2d" % y for y in w) for w in self.board ])
         return s
 
 def manhattanDistance(state):
@@ -134,7 +137,10 @@ if __name__ == '__main__':
     # Processing command line arguments
     method = sys.argv[1]
     board = [int(i) for i in sys.argv[2].split(",")]
-    board = [board[i:i+3] for i in range(0, len(board), 3)]
+
+    # FIXME: Improve the implementation on arbitrary length board
+    n = int(sqrt(len(board)))
+    board = [board[i:i+n] for i in range(0, len(board), n)]
     zero = next(((i, array.index(0))
         for i, array in enumerate(board)
         if 0 in array),
