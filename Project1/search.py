@@ -152,7 +152,7 @@ class Solver:
                     neighbor.depth = state.depth + 1
                     if neighbor not in explored:
                         frontier.push(neighbor)
-                        explored.add(neighbor)
+                        #explored.add(neighbor)
                         self.fringe_size += 1
                         if self.fringe_size > self.max_fringe_size:
                             self.max_fringe_size = self.fringe_size
@@ -161,9 +161,10 @@ class Solver:
             ram = getrusage(RUSAGE_SELF).ru_maxrss / 1024
             if ram > self.max_ram_usage:
                 self.max_ram_usage = ram
+        self.running_time = time.time() - start_time
         return False
 
-    def iterativeDeepening(self, problem):
+    def iterativeDeepening(self, problem, maxDepth=100):
         """
         Search for a solution using IDS strategy
         """
@@ -171,8 +172,12 @@ class Solver:
         # Initial depth
         k = 0
 
+        total_time = 0.0
         # Applies DLS using different depths
+        
         while not self.depthLimitedSearch(problem, k):
+            print str(self.running_time)
+            total_time += self.running_time
             self.path = []
             self.cost_of_path = 0
             self.nodes_expanded = 0
@@ -183,6 +188,10 @@ class Solver:
             self.running_time = 0
             self.max_ram_usage = 0
             k += 1
+            if k > maxDepth:
+                return False
+        self.running_time = total_time
+        return True
 
     def uniformCostSearch(self, problem):
         """
