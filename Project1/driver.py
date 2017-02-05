@@ -124,7 +124,7 @@ class Npuzzle(Problem):
     def getCostOfAction(self, state):
         return state.cost
 
-    def f(self, state, h, idx):
+    def f(self, state, h):
         value = {"Up": 0.1, "Down": 0.2, "Left": 0.3, "Right": 0.4}
         return self.getCostOfAction(state) + h(state) + value[state.action]
     

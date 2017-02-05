@@ -270,8 +270,7 @@ class Solver:
                 neighbor.depth = state.depth + 1
                 if neighbor not in explored:
                     if neighbor not in frontier_set:
-                        idx += 1
-                        frontier.insert(neighbor, problem.f(neighbor, h, idx))
+                        frontier.insert(neighbor, problem.f(neighbor, h))
                         frontier_set.add(neighbor)
                         self.fringe_size += 1
                         if self.fringe_size > self.max_fringe_size:
@@ -279,7 +278,7 @@ class Solver:
                         if neighbor.depth > self.max_search_depth:
                             self.max_search_depth = neighbor.depth
                     else:
-                        frontier.decreaseKey(neighbor, problem.f(neighbor, h, idx))
+                        frontier.decreaseKey(neighbor, problem.f(neighbor, h))
                     
                 
             ram = getrusage(RUSAGE_SELF).ru_maxrss / 1024
@@ -317,7 +316,7 @@ class Solver:
                 self.nodes_expanded += 1
                 for neighbor in neighbors:
                     neighbor.depth = state.depth + 1
-                    if neighbor not in explored:
+                    if neighbor not in explored and problem.f(neighbor, h) <= bound:
                         frontier.push(neighbor)
                         explored.add(neighbor)
                         self.fringe_size += 1
