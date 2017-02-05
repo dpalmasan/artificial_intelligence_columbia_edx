@@ -58,6 +58,21 @@ class PriorityQueue:
         (_, _, item) = heapq.heappop(self.heap)
         return item
 
+    def decreaseKey(self, item, priority):
+        """
+        Replaces a repeated item with the minimum cost
+        """
+        for i in xrange(len(self.heap)):
+            if self.heap[i][2] == item:
+                break
+
+        if self.heap[i][0] > priority:
+            self.heap[i] = self.heap[-1]
+            self.heap.pop()
+            heapq._siftup(self.heap, i)
+            heapq._siftdown(self.heap, 0, i)
+            self.insert(item, priority)
+        
 
     def __len__(self):
         return len(self.heap)
@@ -69,12 +84,9 @@ def nullHeuristic(state):
     return 0
 
 if __name__ == "__main__":
-    s = Stack()
-    s.push(1)
-    s.push(3)
-    s.push(0)
-    print s.stack
-    print s.pop()
-    print s.pop()
-    print s.stack
-    print s.pop()
+    s = PriorityQueue()
+    s.insert(1, 4)
+    s.decreaseKey(1, 3)
+    
+    print str(s.heap)
+    

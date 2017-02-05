@@ -95,11 +95,11 @@ def manhattanDistance(state):
 
     # TODO: This should work for a board of arbitrary dimensions
     manDist = 0
-    for i in range(3):
-        for j in range(3):
+    for i in range(state.n):
+        for j in range(state.n):
             if state.board[i][j] != 0:
-                ii = state.board[i][j] / 3
-                jj = state.board[i][j] % 3
+                ii = state.board[i][j] / state.n
+                jj = state.board[i][j] % state.n
                 manDist += abs(ii - i) + abs(jj - j)
     return manDist
     
@@ -125,8 +125,8 @@ class Npuzzle(Problem):
         return state.cost
 
     def f(self, state, h, idx):
-        value = {"Up": 0, "Down": 1, "Left": 2, "Right": 3}
-        return (self.getCostOfAction(state) + h(state), value[state.action], idx)
+        value = {"Up": 0.1, "Down": 0.2, "Left": 0.3, "Right": 0.4}
+        return self.getCostOfAction(state) + h(state) + value[state.action]
     
 
 if __name__ == '__main__':
@@ -159,6 +159,8 @@ if __name__ == '__main__':
         solver.uniformCostSearch(problem)
     elif method == 'ast':
         solver.aStarSearch(problem, manhattanDistance)
+    elif method == 'ida':
+        solver.iterativeDeepeningAstar(problem, manhattanDistance)
     else:
         solver.iterativeDeepening(problem)
 
