@@ -176,7 +176,6 @@ class Solver:
         # Applies DLS using different depths
         
         while not self.depthLimitedSearch(problem, k):
-            print str(self.running_time)
             total_time += self.running_time
             self.path = []
             self.cost_of_path = 0
