@@ -25,7 +25,7 @@ class App(tk.Tk):
         self.canvas.pack(side="top", fill="both", expand="true")
         
         # delay in seconds, used for animation purposes.
-        delay = 1
+        delay = 0.5
 
         # Menu
         menubar = MenuBar(self)
@@ -75,6 +75,7 @@ class App(tk.Tk):
             solver.breadthFirstSearch(problem)
         elif method == 'dfs':
             solver.depthFirstSearch(problem)
+            delay /= 100.0
         elif method == 'ucs':
             solver.uniformCostSearch(problem)
         elif method == 'ast':
@@ -84,7 +85,7 @@ class App(tk.Tk):
         else:
             solver.iterativeDeepening(problem)
 
-        print "Solution found!"
+        print "A solution of %d moves was found!" % solver.cost_of_path
 
         time.sleep(delay)
         for action in solver.path:
