@@ -8,7 +8,7 @@ These are my solutions for the project 1. The project consisted on implementing 
 
 * search.py: It is sort of a framework, in which given a problem (defined as a class), can apply search strategies to that problem for finding a solution.
 
-
+* visualizer.py: Solves a worst case 8-puzzle given a strategy, and then, shows in a GUI the path to the solution (It uses Tkinter).
 
 ##Test Case no. 1
 

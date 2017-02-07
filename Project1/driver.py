@@ -40,6 +40,25 @@ class State:
             actions.append('Right')
         return actions
 
+    def move(self, action):
+        i, j = self.zero
+        if action == 'Up':
+            self.board[i][j] = self.board[i - 1][j]
+            self.board[i - 1][j] = 0
+            self.zero = (i - 1, j)
+        elif action == 'Down':
+            self.board[i][j] = self.board[i + 1][j]
+            self.board[i + 1][j] = 0
+            self.zero = (i + 1, j)
+        elif action == 'Left':
+            self.board[i][j] = self.board[i][j - 1]
+            self.board[i][j - 1] = 0
+            self.zero = (i, j - 1)
+        elif action == 'Right':
+            self.board[i][j] = self.board[i][j + 1]
+            self.board[i][j + 1] = 0
+            self.zero = (i, j + 1)  
+
     def expand(self):
         """
         Returns a list of states, that are the result of applying
