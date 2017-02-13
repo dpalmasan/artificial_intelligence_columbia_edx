@@ -36,7 +36,7 @@ class App(tk.Tk):
         menubar.fileMenu.add_command(label="A*", underline=1, command=lambda: self.solve("ast", delay))
         menubar.fileMenu.add_command(label="Iterative Deepening A*", underline=1, command=lambda: self.solve("ida", delay))
         menubar.fileMenu.add_separator()
-        menubar.fileMenu.add_command(label="Reset", underline=1, command=self.exit)
+        menubar.fileMenu.add_command(label="Reset", underline=1, command=self.reset)
         menubar.fileMenu.add_separator()
         menubar.fileMenu.add_command(label="Exit", underline=1, command=self.exit)
         self.config(menu=menubar)
@@ -68,16 +68,16 @@ class App(tk.Tk):
         Solves the puzzle using a search strategy (method) and the
         animation has a delay given by delay
         """
-        global solver
         global problem
         global state
+
+        solver = Solver()
 
         print "Searching for a solution using " + method + " strategy"        
         if method == 'bfs':
             solver.breadthFirstSearch(problem)
         elif method == 'dfs':
             solver.depthFirstSearch(problem)
-            delay /= 100.0
         elif method == 'ucs':
             #solver.uniformCostSearch(problem)
             solver.aStarSearch(problem)
@@ -120,6 +120,32 @@ class App(tk.Tk):
         output += "Max RAM usage: %.8f\n" % solver.max_ram_usage
         tkMessageBox.showinfo("Statistics", output)
 
+    def reset(self):
+        global puzzle, puzzle_i, state, zero, problem
+
+        # Re-setting variables
+        puzzle = [list(row) for row in puzzle_i]
+        state = State(puzzle, zero, 0)
+        problem = Npuzzle(state)
+
+        # Re-draw initial puzzle
+        self.rect = {}
+        self.puzzle = puzzle
+        for column in range(3):
+            for row in range(3):
+                x1 = column*self.cellwidth
+                y1 = row * self.cellheight
+                x2 = x1 + self.cellwidth
+                y2 = y1 + self.cellheight
+                if self.puzzle[row][column] != 0:
+                    self.rect[row,column] = self.canvas.create_rectangle(x1,y1,x2,y2, fill="white", tags="rect")
+                    canvas_id = self.canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, font=("Helvetica", 40))
+                    self.canvas.itemconfig(canvas_id, text=str(self.puzzle[row][column]))
+                else:
+                    self.rect[row,column] = self.canvas.create_rectangle(x1,y1,x2,y2, fill="black", tags="rect")
+        
+        
+
     def exit(self):
         sys.exit(0)
 
@@ -139,7 +165,7 @@ if __name__ == "__main__":
     state = State(board, zero, 0)
     state.randomize(50)
     problem = Npuzzle(state)
-    solver = Solver()
     puzzle = state.board
+    puzzle_i, zero = [list(row) for row in state.board], state.zero
     app = App()
     app.mainloop()
