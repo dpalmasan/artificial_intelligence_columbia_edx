@@ -187,6 +187,8 @@ class Solver:
             k += 1
             if k > maxDepth:
                 return False
+        total_time = self.running_time if total_time < self.running_time else total_time
+        total_nodes = self.nodes_expanded if total_nodes < self.nodes_expanded else total_nodes
         self.running_time = total_time
         self.nodes_expanded = total_nodes
         return True
@@ -352,6 +354,9 @@ class Solver:
             bound += 1
             if bound > maxBound:
                 return False
+
+        total_time = self.running_time if total_time < self.running_time else total_time
+        total_nodes = self.nodes_expanded if total_nodes < self.nodes_expanded else total_nodes
         self.running_time = total_time
         self.nodes_expanded = total_nodes
         return True
