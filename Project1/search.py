@@ -9,16 +9,16 @@ class Problem:
     """
 
     def getStartState(self):
-        raise "Not implemented"
+        raise NotImplementedError
 
     def isGoalState(self):
-        raise "Not Implemented"
+        raise NotImplementedError
 
     def getSuccessors(self):
-        raise "Not Implemented"
+        raise NotImplementedError
 
     def getCostOfAction(self):
-        raise "Not Implemented"
+        raise NotImplementedError
 
 class Solver:
     """
