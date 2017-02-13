@@ -66,11 +66,13 @@ class PriorityQueue:
             if self.heap[i][2] == item:
                 break
 
+        isLast = i == len(self.heap) - 1
         if self.heap[i][0] > priority:
             self.heap[i] = self.heap[-1]
             self.heap.pop()
-            heapq._siftup(self.heap, i)
-            heapq._siftdown(self.heap, 0, i)
+            if not isLast:
+                heapq._siftup(self.heap, i)
+                heapq._siftdown(self.heap, 0, i)
             self.insert(item, priority)
         
 

@@ -1,6 +1,7 @@
 import sys
 from search import *
 from math import sqrt
+import random
 
 class State:
     """
@@ -23,6 +24,7 @@ class State:
                 if (self.n*i + j) != self.board[i][j]:
                     return False
         return True
+
     def getActions(self):
         """
         Returns a list of available actions from the current state.
@@ -58,6 +60,14 @@ class State:
             self.board[i][j] = self.board[i][j + 1]
             self.board[i][j + 1] = 0
             self.zero = (i, j + 1)  
+
+    def randomize(self, moves=100):
+        """
+        Randomizes an instance of the puzzle, by # moves
+        """
+        for i in xrange(moves):
+            actions = self.getActions()
+            self.move(random.choice(actions))
 
     def expand(self):
         """

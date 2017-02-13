@@ -36,6 +36,8 @@ class App(tk.Tk):
         menubar.fileMenu.add_command(label="A*", underline=1, command=lambda: self.solve("ast", delay))
         menubar.fileMenu.add_command(label="Iterative Deepening A*", underline=1, command=lambda: self.solve("ida", delay))
         menubar.fileMenu.add_separator()
+        menubar.fileMenu.add_command(label="Reset", underline=1, command=self.exit)
+        menubar.fileMenu.add_separator()
         menubar.fileMenu.add_command(label="Exit", underline=1, command=self.exit)
         self.config(menu=menubar)
 
@@ -77,7 +79,8 @@ class App(tk.Tk):
             solver.depthFirstSearch(problem)
             delay /= 100.0
         elif method == 'ucs':
-            solver.uniformCostSearch(problem)
+            #solver.uniformCostSearch(problem)
+            solver.aStarSearch(problem)
         elif method == 'ast':
             solver.aStarSearch(problem, manhattanDistance)
         elif method == 'ida':
@@ -120,11 +123,13 @@ class App(tk.Tk):
     def exit(self):
         sys.exit(0)
 
+        
+
 if __name__ == "__main__":
     # We are testing with the "worst case" puzzle
     # TODO: Add command line arguments to test any puzzle
     n = 3
-    board = [8, 7, 6, 5, 4, 3, 2, 1, 0]
+    board = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     board = [board[i:i+n] for i in range(0, len(board), n)]
     zero = next(((i, array.index(0))
         for i, array in enumerate(board)
@@ -132,6 +137,7 @@ if __name__ == "__main__":
         None)
     
     state = State(board, zero, 0)
+    state.randomize(50)
     problem = Npuzzle(state)
     solver = Solver()
     puzzle = state.board

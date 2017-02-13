@@ -127,11 +127,9 @@ class Solver:
         start_time = time.time()
         frontier = Stack()
         frontier.push(problem.getStartState())
-        explored = set()
         while not frontier.isEmpty():
             state = frontier.pop()
             self.fringe_size -= 1
-            explored.add(state)
             if problem.isGoalState(state):
                 curr = state
                 path = []
@@ -150,14 +148,12 @@ class Solver:
                 neighbors.reverse()
                 for neighbor in neighbors:
                     neighbor.depth = state.depth + 1
-                    if neighbor not in explored:
-                        frontier.push(neighbor)
-                        #explored.add(neighbor)
-                        self.fringe_size += 1
-                        if self.fringe_size > self.max_fringe_size:
-                            self.max_fringe_size = self.fringe_size
-                        if neighbor.depth > self.max_search_depth:
-                            self.max_search_depth = neighbor.depth
+                    frontier.push(neighbor)
+                    self.fringe_size += 1
+                    if self.fringe_size > self.max_fringe_size:
+                        self.max_fringe_size = self.fringe_size
+                    if neighbor.depth > self.max_search_depth:
+                        self.max_search_depth = neighbor.depth
             ram = getrusage(RUSAGE_SELF).ru_maxrss / 1024
             if ram > self.max_ram_usage:
                 self.max_ram_usage = ram
@@ -173,10 +169,12 @@ class Solver:
         k = 0
 
         total_time = 0.0
+        total_nodes = 0
         # Applies DLS using different depths
         
         while not self.depthLimitedSearch(problem, k):
             total_time += self.running_time
+            total_nodes += self.nodes_expanded
             self.path = []
             self.cost_of_path = 0
             self.nodes_expanded = 0
@@ -190,11 +188,12 @@ class Solver:
             if k > maxDepth:
                 return False
         self.running_time = total_time
+        self.nodes_expanded = total_nodes
         return True
 
     def uniformCostSearch(self, problem):
         """
-        Implements Depth First Search Strategy
+        Implements Uniform Cost Search Strategy
         """
         start_time = time.time()
         frontier = PriorityQueue()
@@ -292,11 +291,9 @@ class Solver:
         start_time = time.time()
         frontier = Stack()
         frontier.push(problem.getStartState())
-        explored = set()
         while not frontier.isEmpty():
             state = frontier.pop()
             self.fringe_size -= 1
-            explored.add(state)
             if problem.isGoalState(state):
                 curr = state
                 path = []
@@ -309,20 +306,20 @@ class Solver:
                 self.running_time = time.time() - start_time
                 return True
             
-            if state.depth + h(state) <= bound:
-                neighbors = problem.getSuccessors(state)
-                neighbors.reverse()
-                self.nodes_expanded += 1
-                for neighbor in neighbors:
-                    neighbor.depth = state.depth + 1
-                    if neighbor not in explored and problem.f(neighbor, h) <= bound:
-                        frontier.push(neighbor)
-                        explored.add(neighbor)
-                        self.fringe_size += 1
-                        if self.fringe_size > self.max_fringe_size:
-                            self.max_fringe_size = self.fringe_size
-                        if neighbor.depth > self.max_search_depth:
-                            self.max_search_depth = neighbor.depth
+            neighbors = problem.getSuccessors(state)
+            neighbors.reverse()
+            self.nodes_expanded += 1
+            for neighbor in neighbors:
+                neighbor.depth = state.depth + 1
+                f = neighbor.cost + h(neighbor)
+                if f <= bound:
+                    frontier.push(neighbor)
+                    self.fringe_size += 1
+                    if self.fringe_size > self.max_fringe_size:
+                        self.max_fringe_size = self.fringe_size
+                    if neighbor.depth > self.max_search_depth:
+                        self.max_search_depth = neighbor.depth
+                    
             ram = getrusage(RUSAGE_SELF).ru_maxrss / 1024
             if ram > self.max_ram_usage:
                 self.max_ram_usage = ram
@@ -338,10 +335,11 @@ class Solver:
         bound = h(problem.getStartState())
 
         total_time = 0.0
-        # Applies DLS using different depths
+        total_nodes = 0
         
         while not self.boundLimitedSearch(problem, h, bound):
             total_time += self.running_time
+            total_nodes += self.nodes_expanded
             self.path = []
             self.cost_of_path = 0
             self.nodes_expanded = 0
@@ -355,4 +353,5 @@ class Solver:
             if bound > maxBound:
                 return False
         self.running_time = total_time
+        self.nodes_expanded = total_nodes
         return True
