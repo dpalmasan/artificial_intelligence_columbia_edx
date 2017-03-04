@@ -11,8 +11,11 @@ and using 5-fold cross validation, search for the best model.
 ##To execute the codes:
 
 `python problem1.py <input.csv> <output.csv>`
+
 `python problem2.py <input.csv> <output.csv>`
+
 `python problem3.py`
+
 `python problem3_visualize.py`
 
 
