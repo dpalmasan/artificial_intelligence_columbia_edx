@@ -8,3 +8,5 @@ __pycache__/
 
 # Output Files
 output.txt
+*.csv
+!Project3/
