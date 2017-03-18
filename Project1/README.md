@@ -10,7 +10,7 @@ These are my solutions for the project 1. The project consisted on implementing 
 
 * visualizer.py: Solves a random instance of 8-puzzle given a strategy, and then, shows in a GUI the path to the solution (It uses Tkinter).
 
-##Test Case no. 1
+## Test Case no. 1
 
 
 `python driver.py bfs 3,1,2,0,4,5,6,7,8`
@@ -22,7 +22,7 @@ These are my solutions for the project 1. The project consisted on implementing 
 `python driver.py ida 3,1,2,0,4,5,6,7,8`
 
 
-##Test Case no. 2
+## Test Case no. 2
 
 `python driver.py bfs 1,2,5,3,4,0,6,7,8`
 
