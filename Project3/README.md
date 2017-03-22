@@ -8,7 +8,7 @@ These are my solutions for the project 3. The project consisted on implementing 
 and using 5-fold cross validation, search for the best model.
 * problem3_visualize.py: Plot the decision boundaries of models found in problem3.py.
 
-##To execute the codes:
+## To execute the codes:
 
 `python problem1.py <input.csv> <output.csv>`
 
