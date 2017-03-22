@@ -14,7 +14,7 @@ These are my solutions for the project 2. The project consisted on implementing 
 
 * BaseDisplayer.py and Displayer.py. These print the grid.
 
-##To execute the code:
+## To execute the code:
 
 `python GameManager.py`
 
