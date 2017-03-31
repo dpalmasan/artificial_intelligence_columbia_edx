@@ -8,7 +8,10 @@ __pycache__/
 
 # Output Files
 output.txt
+unigram*
+bigram*
 
 # Data Files for project 5
 *.tar.gz
 aclImdb/
+imdb*
