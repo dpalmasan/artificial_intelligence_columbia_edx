@@ -8,3 +8,7 @@ __pycache__/
 
 # Output Files
 output.txt
+
+# Data Files for project 5
+*.tar.gz
+aclImdb/
